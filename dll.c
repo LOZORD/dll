@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#define uint unsigned int
 
 struct node
 {
@@ -17,7 +18,6 @@ struct list
 {
   Node * head;
   Node * tail;
-  unsigned int size;
 };
 
 int println (char * str)
@@ -41,6 +41,21 @@ int set (List * p, int index, int val);
 int first (List * p);
 int last (List * p);
 void destroyList (List * p);
+uint size (List * p);
+
+//FIXME
+uint size (List * listPtr)
+{
+  //return (uint)(listPtr->tail - listPtr->head);
+  if (listPtr->head == NULL)
+  {
+    return 0;
+  }
+  else
+  {
+    return (uint)(listPtr->tail - listPtr->head) + 1;
+  }
+}
 
 int main (int argc, char ** argv)
 {
@@ -58,7 +73,7 @@ int main (int argc, char ** argv)
     }
   }
 
-  printf("Size of list: %u\n", list.size);
+  printf("Size of list: %u\n", size(&list));
 
   printf("Destroying and freeing list\n");
   destroyList(&list);
@@ -69,12 +84,11 @@ int main (int argc, char ** argv)
 void initList (List * listPtr)
 {
   listPtr->head = listPtr->tail = NULL;
-  listPtr->size = 0;
 }
 
 void destroyList (List * listPtr)
 {
-  if (listPtr->size > 0)
+  if (size(listPtr) > 0)
   {
     Node * itr = listPtr->head;
 
@@ -96,11 +110,12 @@ void initNode (Node * p)
 
 int isEmpty (List * listPtr)
 {
-  return (listPtr->size == 0);
+  return size(listPtr) == 0;
 }
 
 int append (List * listPtr, int i)
 {
+  printf("Appending a new Node with value %d\n", i);
   Node * newNode = malloc(sizeof(Node));
   initNode(newNode);
   newNode->value = i;
@@ -112,6 +127,5 @@ int append (List * listPtr, int i)
   {
     listPtr->tail = newNode;
   }
-  listPtr->size++;
   return 0;
 }
