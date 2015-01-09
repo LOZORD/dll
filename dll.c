@@ -18,6 +18,7 @@ struct list
 {
   Node * head;
   Node * tail;
+  int size;
 };
 
 int println (char * str)
@@ -30,8 +31,9 @@ typedef struct list List;
 /* list operations */
 void initList (List * p);
 int append (List * p, int i);
-int find   (List * p, int i);
+int contains   (List * p, int i);
 int deleteOcc (List * p, int i);
+int removeDups(List * p, int i);
 int deleteNode (Node * p);
 int isEmpty(List * p);
 int max (List * p);
@@ -41,21 +43,6 @@ int set (List * p, int index, int val);
 int first (List * p);
 int last (List * p);
 void destroyList (List * p);
-uint size (List * p);
-
-//FIXME
-uint size (List * listPtr)
-{
-  //return (uint)(listPtr->tail - listPtr->head);
-  if (listPtr->head == NULL)
-  {
-    return 0;
-  }
-  else
-  {
-    return (uint)(listPtr->tail - listPtr->head) + 1;
-  }
-}
 
 int main (int argc, char ** argv)
 {
@@ -73,7 +60,7 @@ int main (int argc, char ** argv)
     }
   }
 
-  printf("Size of list: %u\n", size(&list));
+  printf("\tFinal Size of list: %u\n", list.size);
 
   printf("Destroying and freeing list\n");
   destroyList(&list);
@@ -88,16 +75,18 @@ void initList (List * listPtr)
 
 void destroyList (List * listPtr)
 {
-  if (size(listPtr) > 0)
+  if (listPtr->size > 0)
   {
     Node * itr = listPtr->head;
 
     while (itr)
     {
       Node * next = itr->fwd;
+      //destroyNode(itr); TODO
       free(itr);
       itr = next;
     }
+    listPtr->size = 0;
   }
 }
 
@@ -110,7 +99,7 @@ void initNode (Node * p)
 
 int isEmpty (List * listPtr)
 {
-  return size(listPtr) == 0;
+  return listPtr->size == 0;
 }
 
 int append (List * listPtr, int i)
@@ -125,7 +114,64 @@ int append (List * listPtr, int i)
   }
   else
   {
+    newNode->rev = listPtr->tail;
+    listPtr->tail->fwd = newNode;
     listPtr->tail = newNode;
   }
+  listPtr->size++;
   return 0;
+}
+
+int contains (List * listPtr, int val)
+{
+  Node * itr = listPtr->head;
+
+  while(itr)
+  {
+    if (itr->value == val)
+    {
+      return 1;
+    }
+    itr = itr->fwd;
+  }
+  return 0;
+}
+
+//deletes all occurences of a value in the list
+int deleteOcc (List * listPtr, int val)
+{
+  //Node * itr = listPtr->head;
+
+  /* FIXME impl deleteNode
+  while(itr)
+  {
+    Node * next = itr->fwd;
+    if (itr->value == val)
+    {
+      deleteNode(itr);
+    }
+    itr = next;
+  }
+  */
+  return 0;
+}
+
+int min (List * listPtr)
+{
+  int headVal = listPtr->head->value;
+
+  if (listPtr->size == 1)
+  {
+    return headVal;
+  }
+  else
+  {
+    List * decapt = NULL;
+    initList(decapt);
+    decapt->head = listPtr->head->fwd;
+    decapt->tail = listPtr->tail;
+    decapt->size = listPtr->size - 1;
+    int tailMin = min(decapt);
+    return headVal < tailMin ? headVal : tailMin;
+  }
 }
