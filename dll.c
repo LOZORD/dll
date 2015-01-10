@@ -29,16 +29,17 @@ int println (char * str)
 typedef struct list List;
 
 /* list operations */
-void initList (List * p);
+List initList ();
 int append (List * p, int i);
+Node * find (List * p, int i);
 int contains   (List * p, int i);
 int deleteOcc (List * p, int i);
 int removeDups(List * p, int i);
-int deleteNode (Node * p);
+void deleteNode (Node * p);
 int isEmpty(List * p);
 int max (List * p);
 int min (List * p);
-int get (List * p, int index);
+Node * get (List * p, int index);
 int set (List * p, int index, int val);
 int first (List * p);
 int last (List * p);
@@ -49,8 +50,7 @@ int main (int argc, char ** argv)
   printf("Beginning Doubly Linked List Test\n");
 
   //create a new list
-  List list;
-  initList(&list);
+  List list = initList();
 
   if (argc > 1)
   {
@@ -68,9 +68,12 @@ int main (int argc, char ** argv)
   exit(0);
 }
 
-void initList (List * listPtr)
+List initList ()
 {
-  listPtr->head = listPtr->tail = NULL;
+  List l;
+  l.head = l.tail = NULL;
+  l.size = 0;
+  return l;
 }
 
 void destroyList (List * listPtr)
@@ -90,11 +93,23 @@ void destroyList (List * listPtr)
   }
 }
 
+//TODO determine which should be used [initNode or newNode]
 void initNode (Node * p)
 {
   p->fwd = NULL;
   p->value = 0xDEADBEEF;
   p->rev = NULL;
+}
+
+Node newNode ()
+{
+  Node ret;
+
+  ret.fwd = NULL;
+  ret.value = 0xDEADBEEF;
+  ret.rev = NULL;
+
+  return ret;
 }
 
 int isEmpty (List * listPtr)
@@ -122,21 +137,6 @@ int append (List * listPtr, int i)
   return 0;
 }
 
-int contains (List * listPtr, int val)
-{
-  Node * itr = listPtr->head;
-
-  while(itr)
-  {
-    if (itr->value == val)
-    {
-      return 1;
-    }
-    itr = itr->fwd;
-  }
-  return 0;
-}
-
 //deletes all occurences of a value in the list
 int deleteOcc (List * listPtr, int val)
 {
@@ -156,6 +156,50 @@ int deleteOcc (List * listPtr, int val)
   return 0;
 }
 
+void deleteNode (Node * nodePtr)
+{
+  Node * prev = nodePtr->rev;
+  Node * next = nodePtr->fwd;
+
+  //if this is not the first node in the list
+  if (prev != NULL)
+  {
+    prev->fwd = next;
+  }
+
+  //if this is not the last node in the list
+  if (next != NULL)
+  {
+    next->rev = prev;
+  }
+
+  free(nodePtr);
+
+  return;
+}
+
+Node * find (List * listPtr, int val)
+{
+  Node * itr = listPtr->head;
+
+  while(itr)
+  {
+    if (itr->value == val)
+    {
+      return itr;
+    }
+    itr = itr->fwd;
+  }
+
+  return NULL;
+}
+
+int contains (List * listPtr, int val)
+{
+  return (find(listPtr, val) != NULL);
+}
+
+//yay recursive solution!
 int min (List * listPtr)
 {
   int headVal = listPtr->head->value;
@@ -166,12 +210,28 @@ int min (List * listPtr)
   }
   else
   {
-    List * decapt = NULL;
-    initList(decapt);
-    decapt->head = listPtr->head->fwd;
-    decapt->tail = listPtr->tail;
-    decapt->size = listPtr->size - 1;
-    int tailMin = min(decapt);
+    List decapt = initList();
+    decapt.head = listPtr->head->fwd;
+    decapt.tail = listPtr->tail;
+    decapt.size = listPtr->size - 1;
+    int tailMin = min(&decapt);
     return headVal < tailMin ? headVal : tailMin;
   }
+}
+
+Node * get (List * listPtr, int index)
+{
+  Node * itr = listPtr->head;
+
+  while (itr && index--)
+  {
+    itr = itr->fwd;
+  }
+
+  return itr;
+}
+
+int getVal (List * listPtr, int index)
+{
+  return get(listPtr,index)->value;
 }
