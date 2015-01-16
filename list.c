@@ -23,6 +23,7 @@ int set (List * p, int index, int val);
 int first (List * p);
 int last (List * p);
 void destroyList (List * p);
+List * tail (List * p);
 
 void initList (List * listPtr)
 {
@@ -80,20 +81,19 @@ uint append (List * listPtr, int i)
 //deletes all occurences of a value in the list
 int deleteOcc (List * listPtr, int val)
 {
-  //Node * itr = listPtr->head;
-
-  /* FIXME impl deleteNode
+  Node * itr = listPtr->head;
+  uint deleteCount = 0;
   while(itr)
   {
     Node * next = itr->fwd;
     if (itr->value == val)
     {
       deleteNode(itr);
+      deleteCount++;
     }
     itr = next;
   }
-  */
-  return 0;
+  return deleteCount;
 }
 
 void deleteNode (Node * nodePtr)
@@ -175,7 +175,26 @@ Node * get (List * listPtr, int index)
   return itr;
 }
 
-int getVal (List * listPtr, int index)
+int first (List * listPtr)
 {
-  return get(listPtr,index)->value;
+  if (listPtr && listPtr->head)
+  {
+    return listPtr->head->value;
+  }
+  else
+  {
+    return 0x0DEADBEEF;
+  }
+}
+
+int last (List * listPtr)
+{
+  if (listPtr && listPtr->tail)
+  {
+    return listPtr->tail->value;
+  }
+  else
+  {
+    return 0x0DEADBEEF;
+  }
 }
