@@ -26,6 +26,7 @@ int main (int argc, char ** argv)
   }
 
   printf("\tFinal Size of list: %u\n", list->size);
+  printf("\tMin of list: %d\n", min(list));
 
   printf("Destroying and freeing list\n");
   destroyList(list);

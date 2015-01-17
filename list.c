@@ -8,22 +8,24 @@ struct list
 typedef struct list List;
 
 /* list operations */
-void initList (List * p);
-uint append (List * p, int i);
-Node * find (List * p, int i);
-int contains   (List * p, int i);
-int deleteOcc (List * p, int i);
-int removeDups(List * p, int i);
-void deleteNode (Node * p);
-int isEmpty(List * p);
-int max (List * p);
-int min (List * p);
-Node * get (List * p, int index);
-int set (List * p, int index, int val);
-int first (List * p);
-int last (List * p);
-void destroyList (List * p);
-List * tail (List * p);
+void initList (List * p);               //implemented
+uint append (List * p, int i);          //implemented
+Node * find (List * p, int i);          //implemented
+int contains   (List * p, int i);       //implemented
+int deleteOcc (List * p, int i);        //implemented
+int removeDups(List * p, int i);        //TODO
+int isEmpty(List * p);                  //implemented
+int max (List * p);                     //TODO
+int min (List * p);                     //implemented
+Node * get (List * p, int index);       //implemented
+int set (List * p, int index, int val); //TODO
+int first (List * p);                   //implemented
+int last (List * p);                    //implemented
+void destroyList (List * p);            //implemented
+List * tail (List * p);                 //TODO
+List * clone (List * p);                //TODO
+void sort (List * p);                   //TODO
+List * sorted (List * p);               //TODO
 
 void initList (List * listPtr)
 {
@@ -47,8 +49,7 @@ void destroyList (List * listPtr)
     while (itr)
     {
       Node * next = itr->fwd;
-      //destroyNode(itr); TODO
-      free(itr);
+      destroyNode(itr);
       itr = next;
     }
     listPtr->size = 0;
@@ -88,34 +89,13 @@ int deleteOcc (List * listPtr, int val)
     Node * next = itr->fwd;
     if (itr->value == val)
     {
-      deleteNode(itr);
+      destroyNode(itr);
       deleteCount++;
     }
     itr = next;
   }
+  listPtr->size -= deleteCount;
   return deleteCount;
-}
-
-void deleteNode (Node * nodePtr)
-{
-  Node * prev = nodePtr->rev;
-  Node * next = nodePtr->fwd;
-
-  //if this is not the first node in the list
-  if (prev != NULL)
-  {
-    prev->fwd = next;
-  }
-
-  //if this is not the last node in the list
-  if (next != NULL)
-  {
-    next->rev = prev;
-  }
-
-  free(nodePtr);
-
-  return;
 }
 
 Node * find (List * listPtr, int val)
@@ -144,9 +124,10 @@ int min (List * listPtr)
 {
   int headVal = listPtr->head->value;
 
-  if (listPtr->size < 1)
+  if (listPtr->size == 0)
   {
-    return 0x0DEADBEEF;
+    printf("Cannot find minimum of an empty list!\n");
+    exit(1);
   }
   else if (listPtr->size == 1)
   {
@@ -183,7 +164,8 @@ int first (List * listPtr)
   }
   else
   {
-    return 0x0DEADBEEF;
+    printf("Cannot find first value in an empty list!\n");
+    exit(1);
   }
 }
 
@@ -195,6 +177,7 @@ int last (List * listPtr)
   }
   else
   {
-    return 0x0DEADBEEF;
+    printf("Cannot find last value in an empty list!\n");
+    exit(1);
   }
 }
